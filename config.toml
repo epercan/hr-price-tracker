@@ -1,0 +1,7 @@
+data_dir = "data"
+db_path = "data/tracker.db"
+
+[konzum]
+city = "RIJEKA"
+days = 14
+workers = 4
