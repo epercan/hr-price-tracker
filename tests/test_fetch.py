@@ -75,3 +75,18 @@ def test_fetch_filters_city_and_counts_failures(tmp_path, monkeypatch):
     result = fetch(chain, tmp_path, city="RIJEKA", days=14, workers=2)
     assert result == {"downloaded": 1, "skipped": 0, "failed": 1}
     assert "https://cdn/zg.CSV" not in session.calls
+
+
+def test_fetch_continues_when_day_listing_fails(tmp_path):
+    class FlakyChain(FakeChain):
+        def available_dates(self):
+            return [date(2026, 11, 25), date(2026, 11, 26)]
+
+        def discover(self, day):
+            if day == date(2026, 11, 25):
+                raise requests.ConnectionError("timeout")
+            return self.refs
+
+    chain = FlakyChain([make_ref("ok", "RIJEKA")], FakeSession())
+    result = fetch(chain, tmp_path, city="RIJEKA", days=14, workers=1)
+    assert result == {"downloaded": 1, "skipped": 0, "failed": 1}

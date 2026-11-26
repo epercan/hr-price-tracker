@@ -32,7 +32,12 @@ def fetch(chain, data_dir, city=None, days=14, workers=4):
     result = {"downloaded": 0, "skipped": 0, "failed": 0}
     refs = []
     for day in chain.available_dates()[-days:]:
-        day_refs = [r for r in chain.discover(day) if not city or r.store.city == city]
+        try:
+            day_refs = [r for r in chain.discover(day) if not city or r.store.city == city]
+        except Exception as e:
+            result["failed"] += 1
+            print(f"{day}: greška kod dohvaćanja popisa: {e}")
+            continue
         print(f"{day}: {len(day_refs)} cjenika")
         refs.extend(day_refs)
 
