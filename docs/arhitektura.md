@@ -32,8 +32,11 @@ Vatroslava Lisinskog 2 i internet trgovina), sve dostupne dane (~14).
 - CSV je u UTF-8, ~26 000 redaka i ~2,4 MB po poslovnici. Stupci:
   naziv, šifra, marka, neto količina, jedinica mjere, maloprodajna cijena, poseban oblik prodaje
   (DA/NE), naziv posebnog oblika prodaje, cijena za jedinicu mjere, barkod, bazna cijena.
-- Konzum nema zaseban stupac "najniža cijena u 30 dana"; sprema se "bazna cijena", a najniža
-  cijena računa se iz vlastite povijesti.
+- Konzum je 17.11.2026. promijenio format. Stari format (do 16.11.) imao je zasebne stupce
+  za akcijsku cijenu, najnižu cijenu u zadnjih 30 dana i sidrenu cijenu na 2.5.2025.
+  Novi format umjesto njih ima oznaku akcije (DA/NE) i "baznu cijenu". Parser prepoznaje
+  format po zaglavlju i oba svodi na isti zapis. Kad lanac ne objavljuje najnižu cijenu
+  u 30 dana, računa se iz vlastite povijesti.
 
 ## Tok podataka
 
@@ -84,7 +87,7 @@ chains ─< stores ─< prices >─ chain_products >─ products
 - `product_matches` — prijedlozi povezivanja bez barkoda s ocjenom i statusom
   (`pending` / `confirmed` / `rejected`); koristi se od točke 2
 - `prices` — jedan zapis po danu, poslovnici i proizvodu: cijena, cijena po jedinici, akcija
-  (da/ne + naziv), bazna cijena, najniža cijena u 30 dana (ako je lanac objavljuje)
+  (da/ne + naziv), bazna cijena, najniža cijena u 30 dana i sidrena cijena (ako ih lanac objavljuje)
 - `import_log` — uvezene datoteke, broj redaka, vrijeme
 
 ## Čišćenje
