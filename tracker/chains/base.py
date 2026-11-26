@@ -36,6 +36,7 @@ class PriceRecord:
     base_price: float | None
     lowest_30d: float | None
     barcode: str | None
+    anchor_price: float | None = None
 
 
 def open_text(path):

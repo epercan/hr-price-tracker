@@ -74,17 +74,33 @@ class KonzumChain(Chain):
     def parse(self, path):
         with open_text(path) as f:
             for row in csv.DictReader(f):
-                yield PriceRecord(
-                    product_code=row["ŠIFRA PROIZVODA"].strip(),
-                    name=row["NAZIV PROIZVODA"].strip(),
-                    brand=row["MARKA PROIZVODA"].strip() or None,
-                    net_quantity=row["NETO KOLIČINA"].strip() or None,
-                    unit=row["JEDINICA MJERE"].strip() or None,
-                    price=parse_price(row["MALOPRODAJNA CIJENA"]),
-                    unit_price=parse_price(row["CIJENA ZA JEDINICU MJERE"]),
-                    is_promo=row["POSEBAN OBLIK PRODAJE"].strip().upper() == "DA",
-                    promo_name=row["NAZIV POSEBNOG OBLIKA PRODAJE"].strip() or None,
-                    base_price=parse_price(row["BAZNA CIJENA"]),
-                    lowest_30d=None,
-                    barcode=clean_barcode(row["BARKOD"]),
-                )
+                yield self._record(row)
+
+    def _record(self, row):
+        get = lambda key: (row.get(key) or "").strip()
+        price = parse_price(get("MALOPRODAJNA CIJENA"))
+        if "POSEBAN OBLIK PRODAJE" in row:
+            is_promo = get("POSEBAN OBLIK PRODAJE").upper() == "DA"
+            base_price = parse_price(get("BAZNA CIJENA"))
+        else:
+            # stari format (do 16.11.2026.): akcijska cijena u zasebnom stupcu
+            promo_price = parse_price(get("MPC ZA VRIJEME POSEBNOG OBLIKA PRODAJE"))
+            is_promo = promo_price is not None
+            base_price = price
+            if is_promo:
+                price = promo_price
+        return PriceRecord(
+            product_code=get("ŠIFRA PROIZVODA"),
+            name=get("NAZIV PROIZVODA"),
+            brand=get("MARKA PROIZVODA") or None,
+            net_quantity=get("NETO KOLIČINA") or None,
+            unit=get("JEDINICA MJERE") or None,
+            price=price,
+            unit_price=parse_price(get("CIJENA ZA JEDINICU MJERE")),
+            is_promo=is_promo,
+            promo_name=get("NAZIV POSEBNOG OBLIKA PRODAJE") or None,
+            base_price=base_price,
+            lowest_30d=parse_price(get("NAJNIŽA CIJENA U POSLJEDNIH 30 DANA")),
+            barcode=clean_barcode(get("BARKOD")),
+            anchor_price=parse_price(get("SIDRENA CIJENA NA 2.5.2025")),
+        )

@@ -69,10 +69,10 @@ def import_file(conn, chain, path):
             cur = conn.execute("""
                 INSERT OR IGNORE INTO prices
                     (store_id, chain_product_id, date, price, unit_price, is_promo,
-                     promo_name, base_price, lowest_30d)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                     promo_name, base_price, lowest_30d, anchor_price)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (store_id, cp_id, day, rec.price, rec.unit_price, int(rec.is_promo),
-                  rec.promo_name, rec.base_price, rec.lowest_30d))
+                  rec.promo_name, rec.base_price, rec.lowest_30d, rec.anchor_price))
             rows += cur.rowcount
         conn.execute(
             "INSERT INTO import_log (path, chain_id, store_id, date, rows) VALUES (?, ?, ?, ?, ?)",

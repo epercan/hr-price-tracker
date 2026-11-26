@@ -54,6 +54,7 @@ CREATE TABLE IF NOT EXISTS prices (
     promo_name TEXT,
     base_price REAL,
     lowest_30d REAL,
+    anchor_price REAL,
     UNIQUE (store_id, chain_product_id, date)
 );
 CREATE TABLE IF NOT EXISTS import_log (

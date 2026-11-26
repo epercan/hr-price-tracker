@@ -82,3 +82,17 @@ def test_discover_walks_pages_until_no_new_links():
     assert {r.store.city for r in refs} == {"IVANIĆ GRAD", "RIJEKA"}
     assert refs[0].date == date(2026, 11, 26)
     assert len(session.urls) == 2
+
+
+def test_parse_old_format():
+    records = _records(FIXTURES / "konzum_sample_old.csv")
+    assert len(records) == 12
+    keks = next(r for r in records if r.name.startswith("KEKS DOMAĆICA MEDENJACI"))
+    assert keks.is_promo is True
+    assert keks.price == 2.49
+    assert keks.lowest_30d == 3.49
+    assert keks.anchor_price == 3.49
+    regular = records[0]
+    assert regular.is_promo is False
+    assert regular.price == 0.99
+    assert regular.lowest_30d is None
