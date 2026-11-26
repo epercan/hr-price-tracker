@@ -1,3 +1,5 @@
+language = "hr"
+
 data_dir = "data"
 db_path = "data/tracker.db"
 

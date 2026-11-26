@@ -83,7 +83,7 @@ class KonzumChain(Chain):
             is_promo = get("POSEBAN OBLIK PRODAJE").upper() == "DA"
             base_price = parse_price(get("BAZNA CIJENA"))
         else:
-            # stari format (do 16.11.2026.): akcijska cijena u zasebnom stupcu
+            # old format (until 2026-11-16): promo price in a separate column
             promo_price = parse_price(get("MPC ZA VRIJEME POSEBNOG OBLIKA PRODAJE"))
             is_promo = promo_price is not None
             base_price = price

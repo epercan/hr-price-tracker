@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from tracker.i18n import t
 from tracker.clean import normalize_name, parse_quantity, quantity_from_name
 
 
@@ -90,5 +91,5 @@ def import_all(conn, chain, data_dir):
         else:
             result["files"] += 1
             result["rows"] += rows
-            print(f"{path.parent.name} {path.name[:40]}... {rows} cijena")
+            print(t("file_imported", day=path.parent.name, name=path.name[:40], rows=rows))
     return result

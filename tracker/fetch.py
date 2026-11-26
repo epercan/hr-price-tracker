@@ -2,6 +2,8 @@ import gzip
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
+from tracker.i18n import t
+
 RETRY_DELAY = 2
 
 
@@ -36,9 +38,9 @@ def fetch(chain, data_dir, city=None, days=14, workers=4):
             day_refs = [r for r in chain.discover(day) if not city or r.store.city == city]
         except Exception as e:
             result["failed"] += 1
-            print(f"{day}: greška kod dohvaćanja popisa: {e}")
+            print(t("day_error", day=day, error=e))
             continue
-        print(f"{day}: {len(day_refs)} cjenika")
+        print(t("day_files", day=day, count=len(day_refs)))
         refs.extend(day_refs)
 
     with ThreadPoolExecutor(max_workers=workers) as pool:
@@ -49,5 +51,5 @@ def fetch(chain, data_dir, city=None, days=14, workers=4):
                 result["downloaded" if job.result() else "skipped"] += 1
             except Exception as e:
                 result["failed"] += 1
-                print(f"Greška kod {jobs[job].filename}: {e}")
+                print(t("file_error", name=jobs[job].filename, error=e))
     return result
