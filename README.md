@@ -1,13 +1,14 @@
 # hr-price-tracker
 
-Sustav za prikupljanje, analizu i usporedbu cijena proizvoda u hrvatskim trgovačkim lancima.
-Svaki dan preuzima javno objavljene cjenike, svodi ih na zajednički oblik i sprema u SQLite
-bazu, čime se gradi povijest cijena. Nad tim podacima moguće je pretraživati proizvode,
-uspoređivati cijene po poslovnicama i pratiti kretanje cijena kroz vrijeme.
+A system for collecting, analysing and comparing product prices in Croatian retail chains.
+Every day it downloads the publicly published price lists, converts them to a common format
+and stores them in an SQLite database, building a price history. On top of that data you can
+search products, compare prices across stores and follow price changes over time.
 
-Projekt iz kolegija Skriptni jezici. Opis arhitekture nalazi se u [docs/arhitektura.md](docs/arhitektura.md).
+Project for the Scripting Languages course. The architecture is described in
+[docs/architecture.md](docs/architecture.md).
 
-## Instalacija
+## Installation
 
 ```bash
 python3 -m venv .venv
@@ -15,50 +16,51 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-Postavke (grad, broj dana, putanje) nalaze se u `config.toml`. Trenutno se prate
-Konzumove poslovnice u Rijeci.
+Settings (language, city, number of days, paths) are in `config.toml`. Konzum stores in
+Rijeka are currently tracked.
 
-## Korištenje
+## Usage
 
 ```bash
-python -m tracker fetch            # preuzmi cjenike (data/raw/)
-python -m tracker import           # uvezi preuzete cjenike u bazu (data/tracker.db)
+python -m tracker fetch            # download price lists (data/raw/)
+python -m tracker import           # import downloaded price lists (data/tracker.db)
 python -m tracker run              # fetch + import
 
 python -m tracker search trajno mlijeko dukat
-python -m tracker history 3850102019526     # šifra proizvoda ili barkod
+python -m tracker history 3850102019526     # product code or barcode
 python -m tracker compare 3850102019526
 python -m tracker stats
 ```
 
-Primjer:
+The interface is available in Croatian (default) and English. The default is set with
+`language` in `config.toml`; a single command can be run in English with `--lang en`:
 
 ```
-$ python -m tracker history 3850102019526
-Datum       Min     Max     Akcija
-----------  ------  ------  ------
-2026-11-12  2,49 €  2,49 €  da
+$ python -m tracker --lang en history 3850102019526
+Date        Min    Max    Promo
+----------  -----  -----  -----
+2026-11-12  €2.49  €2.49  yes
 ...
-2026-11-17  3,49 €  3,49 €
+2026-11-17  €3.49  €3.49
 ...
-2026-11-24  2,49 €  3,49 €  da
-2026-11-25  2,49 €  2,49 €  da
+2026-11-24  €2.49  €3.49  yes
+2026-11-25  €2.49  €2.49  yes
 ```
 
-Ponovno pokretanje `fetch` i `import` ne duplicira podatke: već preuzete datoteke se
-preskaču, a uvezene se pamte u tablici `import_log`.
+Running `fetch` and `import` again does not duplicate data: files already downloaded are
+skipped and imported files are recorded in the `import_log` table.
 
-## Automatsko pokretanje
+## Scheduling
 
-Cjenici se objavljuju svako jutro do 8 sati. Za dnevno preuzimanje dodati u `crontab -e`:
+Price lists are published every morning by 8 am. To download them daily, add to `crontab -e`:
 
 ```
-0 9 * * * /putanja/do/hr-price-tracker/scripts/daily.sh
+0 9 * * * /path/to/hr-price-tracker/scripts/daily.sh
 ```
 
-Ispis se sprema u `data/daily.log`.
+Output is written to `data/daily.log`.
 
-## Testovi
+## Tests
 
 ```bash
 pytest
